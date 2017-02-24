@@ -12,10 +12,17 @@ private:
 	ostream *fout;
 	istream *fin;
 	LexicalAnalyzer *lexAnalyzer;
-	void expr();
-	void term();
-	void factor();
-	void error();
+	bool block();
+	bool declarationSequence();
+	bool declaration();
+	bool declarer();
+	bool nameList();
+	bool statementSequence();
+	bool statement();
+	bool test();
+	bool pair();
+	bool charExpression();
+	bool name();
 public:
 	SyntaxAnalyzer(ostream *fout, istream *fin);
 	void analyzeSyntax();

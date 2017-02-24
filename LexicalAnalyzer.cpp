@@ -100,6 +100,10 @@ int LexicalAnalyzer::lookup(char ch)
 		addChar();
 		nextToken = QUOTE_MARK;
 		break;
+	case ':':
+		addChar();
+		nextToken = COLON;
+		break;
 	default:
 		addChar();
 		nextToken = EOF;
@@ -138,7 +142,7 @@ int LexicalAnalyzer::lex()
 		if (nextChar == '"')
 			nextToken = STRING_LIT;
 		else 
-			nextToken = VARIABLE;
+			nextToken = NAME;
 
 		// Find if the word is actually a reserved word
 		for (int i = 0; i < NUM_RESERVED_WORDS; ++i)

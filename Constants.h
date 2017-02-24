@@ -14,10 +14,11 @@
 
 /* Token codes */
 #define RESERVED_WORD 10
-#define VARIABLE 11
+#define NAME 11
 #define STRING_LIT 12
 #define COMMA 13
 #define QUOTE_MARK 14
+#define COLON 15
 
 #define NUM_RESERVED_WORDS 8
 const char reservedWords[NUM_RESERVED_WORDS][7] = {
@@ -37,14 +38,16 @@ inline char* charArrayForToken(int token)
 	{
 	case RESERVED_WORD:
 		return "RESERVED_WORD";
-	case VARIABLE:
-		return "VARIABLE";
+	case NAME:
+		return "NAME";
 	case STRING_LIT:
 		return "STRING_LIT";
 	case COMMA:
 		return "COMMA";
 	case QUOTE_MARK:
 		return "QUOTE_MARK";
+	case COLON:
+		return "COLON";
 	case EOF:
 		return "EOF";
 	default:

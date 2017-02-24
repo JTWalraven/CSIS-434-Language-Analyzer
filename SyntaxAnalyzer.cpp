@@ -18,11 +18,234 @@ SyntaxAnalyzer::SyntaxAnalyzer(ostream *fout, istream *fin)
 void SyntaxAnalyzer::analyzeSyntax()
 {
 	do {
+		// Get next lexeme
 		lexAnalyzer->lex();
-		//expr();
+
+		// check the block grammar
+		block();
+
+		// Loop until the end of the file
 	} while (lexAnalyzer->getNextToken() != EOF);
+
+	// Report syntax check
 	cout << endl << "Syntax check completed! The syntax of the program is correct." << endl;
 	(*fout) << endl << "Syntax check completed! The syntax of the program is correct." << endl;
+}
+
+
+bool SyntaxAnalyzer::block()
+{
+	// Check if block has BEGIN reserved word
+	if (lexAnalyzer->getNextToken() == RESERVED_WORD && lexAnalyzer->getLexeme() == "BEGIN")
+	{
+		// Get next lexeme
+		lexAnalyzer->lex();
+
+		// Check declaration sequence grammar
+		declarationSequence();
+
+		// Check statement sequence grammar
+		statementSequence();
+
+		// Check if block closes with END reserved word
+		if (lexAnalyzer->getNextToken() == RESERVED_WORD && lexAnalyzer->getLexeme() == "END")
+		{
+			lexAnalyzer->lex();
+			return true;
+		}
+		else
+		{
+			// ERROR
+			return false;
+		}
+	}
+	else
+	{
+		// ERROR
+		return false;
+	}
+}
+
+
+bool SyntaxAnalyzer::declarationSequence()
+{
+	// Check declaration grammar
+	if (declaration())
+	{
+		lexAnalyzer->lex();
+
+		// Check the rest of the sequence
+		declarationSequence();
+		return true;
+	}
+	else
+	{
+		// ERROR
+		return false;
+	}
+}
+
+
+bool SyntaxAnalyzer::declaration()
+{
+	// Check if lexeme is a declarer
+	if (declarer())
+	{
+		lexAnalyzer->lex();
+
+		// Check name list grammar
+		return nameList();
+	}
+	return false;
+}
+
+
+bool SyntaxAnalyzer::declarer()
+{
+	// Check if lexeme is a reserved word
+	if (lexAnalyzer->getNextToken() == RESERVED_WORD)
+	{
+		// Check if the lexeme is CHAR or STRING
+		if (lexAnalyzer->getLexeme() == "CHAR" || lexAnalyzer->getLexeme() == "STRING")
+			return true;
+	}
+	return false;
+}
+
+
+bool SyntaxAnalyzer::nameList()
+{
+	// Check if lexeme is a name
+	if (name())
+	{
+		lexAnalyzer->lex();
+
+		if (lexAnalyzer->getNextToken() == COMMA)
+		{
+			// Check name list grammar
+			return nameList();
+		}
+	}
+	return false;
+}
+
+
+bool SyntaxAnalyzer::statementSequence()
+{
+
+}
+
+
+bool SyntaxAnalyzer::statement()
+{
+	// Check if lexeme is a reserved word
+	if (lexAnalyzer->getNextToken() == RESERVED_WORD)
+	{
+		// Check if the lexeme is OUTPUT
+		if (lexAnalyzer->getLexeme() == "OUTPUT")
+		{
+			lexAnalyzer->lex();
+
+			// Check the grammar of char expression
+			return charExpression();
+		}
+		else if (lexAnalyzer->getLexeme() == "INPUT")
+		{
+			lexAnalyzer->lex();
+
+			// Check the grammar of name
+			return name();
+		}
+	}
+	else 
+	{
+		// Check the test grammar
+		if (test())
+		{
+			lexAnalyzer->lex();
+
+			// Check the pair grammar
+			if (pair())
+			{
+				lexAnalyzer->lex();
+
+				// Check for a colon
+				if (lexAnalyzer->getNextToken() == COLON)
+				{
+					lexAnalyzer->lex();
+
+					// Check the statement grammar
+					return statement();
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
+bool SyntaxAnalyzer::test()
+{
+	return (lexAnalyzer->getLexeme() == "EQ" || lexAnalyzer->getLexeme() == "NEG");
+}
+
+
+bool SyntaxAnalyzer::pair()
+{
+	// Check name grammar
+	if (name())
+	{
+		lexAnalyzer->lex();
+
+		// Check for a comma
+		if (lexAnalyzer->getNextToken() == COMMA)
+		{
+			lexAnalyzer->lex();
+
+			// Check name grammar
+			return name();
+		}
+	}
+	return false;
+}
+
+
+bool SyntaxAnalyzer::charExpression()
+{
+	// Check for a string literal
+	if (lexAnalyzer->getNextToken() == QUOTE_MARK)
+	{
+		lexAnalyzer->lex();
+
+		if (lexAnalyzer->getNextToken() == STRING_LIT)
+		{
+			lexAnalyzer->lex();
+
+			if (lexAnalyzer->getNextToken() == QUOTE_MARK)
+			{
+				return true;
+			}
+			else 
+			{
+				// ERROR
+			}
+		}
+		else
+		{
+			// ERROR
+		}
+	}
+	else if (name())
+	{
+		return true;
+	}
+	return false;
+}
+
+
+bool SyntaxAnalyzer::name()
+{
+	return (lexAnalyzer->getNextToken() == NAME);
 }
 
 /*
