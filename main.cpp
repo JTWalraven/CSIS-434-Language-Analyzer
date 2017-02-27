@@ -11,6 +11,7 @@ int main()
 	ofstream fout;
 	ifstream fin;
 	char exit;
+	int programNumber = 0;
 
 	cout << endl << "Running Lexical Analyzer . . . " << endl;
 	cout << PROGRAM_ID << endl;
@@ -21,8 +22,13 @@ int main()
 	fout << PROGRAM_ID << endl;
 	fout << "                   Main Report" << endl << endl << endl;
 
+	// Ask for program number
+	cout << "Enter the program number to check: ";
+	cin >> programNumber;
+	cout << endl;
+
 	//  PROGRAM LOGIC
-	fin.open("program.dat");
+	fin.open("program" + to_string(programNumber) + ".dat");
 
 	if (!fin)	// Test the State of I/O stream
 	{

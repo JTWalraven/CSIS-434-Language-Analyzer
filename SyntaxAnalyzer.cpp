@@ -122,6 +122,8 @@ bool SyntaxAnalyzer::nameList()
 
 		if (lexAnalyzer->getNextToken() == COMMA)
 		{
+			lexAnalyzer->lex();
+
 			// Check name list grammar
 			return nameList();
 		}
@@ -132,7 +134,15 @@ bool SyntaxAnalyzer::nameList()
 
 bool SyntaxAnalyzer::statementSequence()
 {
+	// Check if lexeme is a statement
+	if (statement())
+	{
+		lexAnalyzer->lex();
 
+		// Check statement sequence grammar
+		return statementSequence();
+	}
+	return false;
 }
 
 
@@ -247,66 +257,6 @@ bool SyntaxAnalyzer::name()
 {
 	return (lexAnalyzer->getNextToken() == NAME);
 }
-
-/*
-void SyntaxAnalyzer::expr()
-{
-	term();
-
-	while (lexAnalyzer->getNextToken() == ADD_OP || lexAnalyzer->getNextToken() == SUB_OP)
-	{
-		lexAnalyzer->lex();
-		term();
-	}
-}
-
-
-void SyntaxAnalyzer::term()
-{
-	factor();
-
-	while (lexAnalyzer->getNextToken() == MULT_OP || lexAnalyzer->getNextToken() == DIV_OP) {
-		lexAnalyzer->lex();
-		factor();
-	}
-}
-
-
-void SyntaxAnalyzer::factor()
-{
-	if (lexAnalyzer->getNextToken() == IDENT || lexAnalyzer->getNextToken() == INT_LIT) {
-		lexAnalyzer->lex();
-	}
-	else 
-	{
-		if (lexAnalyzer->getNextToken() == LEFT_PAREN) {
-			lexAnalyzer->lex();
-			expr();
-
-			// Check for the right parenthesis
-			if (lexAnalyzer->getNextToken() == RIGHT_PAREN) 
-			{
-				lexAnalyzer->lex();
-			}
-			else 
-			{
-				cout << endl << "ERROR: Expected closing parenthesis ')' at the end of line "
-					<< lexAnalyzer->getCurrentLine() << ":" << endl << endl;
-				(*fout) << endl << "ERROR: Expected closing parenthesis ')' at the end of line "
-					<< lexAnalyzer->getCurrentLine() << "." << endl << endl;
-				error();
-			}
-		} 
-		else
-		{
-			cout << endl << "ERROR: Unexpected closing parenthesis ')' on line "
-				<< lexAnalyzer->getCurrentLine() << ":" << endl << endl;
-			(*fout) << endl << "ERROR: Unexpected closing parenthesis ')' on line "
-				<< lexAnalyzer->getCurrentLine() << "." << endl << endl;
-			error();
-		}
-	} 
-} */
 
 void SyntaxAnalyzer::error()
 {

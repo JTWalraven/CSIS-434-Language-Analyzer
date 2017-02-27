@@ -82,7 +82,7 @@
     <ClCompile Include="SyntaxAnalyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="program.dat" />
+    <None Include="program1.dat" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LexicalAnalyzer.h" />

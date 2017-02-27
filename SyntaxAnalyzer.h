@@ -23,6 +23,7 @@ private:
 	bool pair();
 	bool charExpression();
 	bool name();
+	void error();
 public:
 	SyntaxAnalyzer(ostream *fout, istream *fin);
 	void analyzeSyntax();
