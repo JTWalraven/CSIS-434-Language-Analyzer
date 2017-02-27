@@ -15,6 +15,7 @@ private:
 	LexicalAnalyzer *lexAnalyzer;
 	bool tokenMatches(int);
 	bool lexemeMatches(char *);
+	bool program();
 	bool block();
 	bool declarationSequence();
 	bool declaration();

@@ -48,7 +48,8 @@ char* LexicalAnalyzer::getOldLexeme()
 
 void LexicalAnalyzer::addChar()
 {
-	if (lexLen <= 98) {
+	if (lexLen <= 98) 
+	{
 		lexeme[lexLen++] = nextChar;
 		oldLexeme[lexLen - 1] = nextChar;
 		oldLexeme[lexLen] = 0;
@@ -64,7 +65,8 @@ void LexicalAnalyzer::addChar()
 
 void LexicalAnalyzer::getChar()
 {
-	if ((nextChar = (*fin).get()) != EOF) {
+	if ((nextChar = (*fin).get()) != EOF) 
+	{
 		if (isalpha(nextChar))
 			charClass = LETTER;
 		else if (isdigit(nextChar))
@@ -91,7 +93,8 @@ void LexicalAnalyzer::getNonBlank()
 
 int LexicalAnalyzer::lookup(char ch)
 {
-	switch (ch) {
+	switch (ch) 
+	{
 	case ',':
 		addChar();
 		nextToken = COMMA;
@@ -130,7 +133,8 @@ int LexicalAnalyzer::lex()
 	// Important! Reset lexLen to 0 to restart lexeme array
 	lexLen = 0;
 	getNonBlank();
-	switch (charClass) {
+	switch (charClass) 
+	{
 	case LETTER:
 		addChar();
 		getChar();

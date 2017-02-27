@@ -1,6 +1,7 @@
 //Jeffrey Walraven
 //CSIS 434 - Spring 2017
-//main - the driver for the syntax analyzer
+//main - Analyzes the syntax of a specified file. 
+//Note: This is the driver for the syntax analyzer.
 
 #include <stdio.h>
 #include <fstream>
@@ -27,6 +28,7 @@ int main()
 	fout << "                   Main Report" << endl << endl << endl;
 
 	// Ask for program number
+	// The given number will be appended to the filename to run
 	cout << "Enter the program number to check: ";
 	cin >> programNumber;
 	cout << endl;

@@ -18,12 +18,13 @@ SyntaxAnalyzer::SyntaxAnalyzer(ostream *fout, istream *fin)
 
 void SyntaxAnalyzer::analyzeSyntax()
 {
-	do {
+	do 
+	{
 		// Get next lexeme
 		lexAnalyzer->lex();
 
-		// check the block grammar
-		block();
+		// check the program grammar
+		program();
 
 		// Loop until the end of the file
 	} while (!tokenMatches(EOF));
@@ -46,6 +47,17 @@ bool SyntaxAnalyzer::lexemeMatches(char *lexeme)
 }
 
 
+bool SyntaxAnalyzer::program()
+{
+	// Check block grammar
+	if (block())
+		return true;
+	else
+		error();
+	return false;
+}
+
+
 bool SyntaxAnalyzer::block()
 {
 	// Check if block has BEGIN reserved word
@@ -56,12 +68,11 @@ bool SyntaxAnalyzer::block()
 
 		// Check declaration sequence grammar
 		if (!declarationSequence())
-		{
 			error();
-		}
 
 		// Check statement sequence grammar
-		statementSequence();
+		if (!statementSequence())
+			error();
 
 		// Check if block closes with END reserved word
 		if (tokenMatches(RESERVED_WORD) && lexemeMatches("END"))
@@ -71,19 +82,14 @@ bool SyntaxAnalyzer::block()
 		}
 		else
 		{
-			// TODO: message
-			error();
-			// ERROR
-			return false;
+			errorMessage = "ERROR: Expected closing block statement 'END' at line ";
 		}
 	}
 	else
 	{
-			// TODO: message
-		error();
-		// ERROR
-		return false;
+		errorMessage = "ERROR: Expected opening block statement 'BEGIN' at line ";
 	}
+	return false;
 }
 
 
@@ -96,10 +102,7 @@ bool SyntaxAnalyzer::declarationSequence()
 		declarationSequence();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 
@@ -271,6 +274,8 @@ bool SyntaxAnalyzer::name()
 void SyntaxAnalyzer::error()
 {
 	char exit;
+
+	// Write out error report
 	cout << endl << errorMessage
 		<< lexAnalyzer->getCurrentLine() << ":" << endl << endl;
 	(*fout) << endl << errorMessage

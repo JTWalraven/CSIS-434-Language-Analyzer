@@ -11,9 +11,9 @@ class LexicalAnalyzer
 private:
 	ostream *fout;
 	istream *fin;
-	char lexeme[LEXEME_LENGTH];
-	char oldLexeme[LEXEME_LENGTH];
-	char nextChar;
+	char lexeme[LEXEME_LENGTH],
+		oldLexeme[LEXEME_LENGTH],
+		nextChar;
 	int charClass,
 		lexLen,
 		currentLine,
