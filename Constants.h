@@ -1,3 +1,7 @@
+//Jeffrey Walraven
+//CSIS 434 - Spring 2017
+//Constants - contains the lexical and syntax analyzer constant values and methods
+
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 

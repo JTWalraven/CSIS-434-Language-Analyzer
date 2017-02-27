@@ -1,3 +1,7 @@
+//Jeffrey Walraven
+//CSIS 434 - Spring 2017
+//main - the driver for the syntax analyzer
+
 #include <stdio.h>
 #include <fstream>
 #include <iostream>

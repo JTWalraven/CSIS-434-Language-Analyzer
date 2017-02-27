@@ -1,0 +1,7 @@
+BEGIN
+	CHAR a, b
+	STRING c, d
+	OUTPUT c
+	OUTPUT "hello
+	EQ a, b : OUTPUT "test"
+END

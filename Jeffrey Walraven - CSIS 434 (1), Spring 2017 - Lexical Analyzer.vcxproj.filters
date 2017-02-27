@@ -40,5 +40,11 @@
     <None Include="program1.dat">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="program2.dat">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="program3.dat">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

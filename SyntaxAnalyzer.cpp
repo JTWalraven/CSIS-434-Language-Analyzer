@@ -12,6 +12,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(ostream *fout, istream *fin)
 	this->fout = fout;
 	this->fin = fin;
 	this->lexAnalyzer = new LexicalAnalyzer(fout, fin);
+	this->errorMessage = "An error was thrown at line ";
 }
 
 
@@ -25,7 +26,7 @@ void SyntaxAnalyzer::analyzeSyntax()
 		block();
 
 		// Loop until the end of the file
-	} while (lexAnalyzer->getNextToken() != EOF);
+	} while (!tokenMatches(EOF));
 
 	// Report syntax check
 	cout << endl << "Syntax check completed! The syntax of the program is correct." << endl;
@@ -33,34 +34,53 @@ void SyntaxAnalyzer::analyzeSyntax()
 }
 
 
+bool SyntaxAnalyzer::tokenMatches(int token)
+{
+	return lexAnalyzer->getNextToken() == token;
+}
+
+
+bool SyntaxAnalyzer::lexemeMatches(char *lexeme)
+{
+	return strcmp(lexAnalyzer->getLexeme(), lexeme) == 0;
+}
+
+
 bool SyntaxAnalyzer::block()
 {
 	// Check if block has BEGIN reserved word
-	if (lexAnalyzer->getNextToken() == RESERVED_WORD && lexAnalyzer->getLexeme() == "BEGIN")
+	if (tokenMatches(RESERVED_WORD) && lexemeMatches("BEGIN"))
 	{
 		// Get next lexeme
 		lexAnalyzer->lex();
 
 		// Check declaration sequence grammar
-		declarationSequence();
+		if (!declarationSequence())
+		{
+			error();
+		}
 
 		// Check statement sequence grammar
 		statementSequence();
 
 		// Check if block closes with END reserved word
-		if (lexAnalyzer->getNextToken() == RESERVED_WORD && lexAnalyzer->getLexeme() == "END")
+		if (tokenMatches(RESERVED_WORD) && lexemeMatches("END"))
 		{
 			lexAnalyzer->lex();
 			return true;
 		}
 		else
 		{
+			// TODO: message
+			error();
 			// ERROR
 			return false;
 		}
 	}
 	else
 	{
+			// TODO: message
+		error();
 		// ERROR
 		return false;
 	}
@@ -72,15 +92,12 @@ bool SyntaxAnalyzer::declarationSequence()
 	// Check declaration grammar
 	if (declaration())
 	{
-		lexAnalyzer->lex();
-
 		// Check the rest of the sequence
 		declarationSequence();
 		return true;
 	}
 	else
 	{
-		// ERROR
 		return false;
 	}
 }
@@ -103,10 +120,10 @@ bool SyntaxAnalyzer::declaration()
 bool SyntaxAnalyzer::declarer()
 {
 	// Check if lexeme is a reserved word
-	if (lexAnalyzer->getNextToken() == RESERVED_WORD)
+	if (tokenMatches(RESERVED_WORD))
 	{
 		// Check if the lexeme is CHAR or STRING
-		if (lexAnalyzer->getLexeme() == "CHAR" || lexAnalyzer->getLexeme() == "STRING")
+		if (lexemeMatches("CHAR") || lexemeMatches("STRING"))
 			return true;
 	}
 	return false;
@@ -120,12 +137,16 @@ bool SyntaxAnalyzer::nameList()
 	{
 		lexAnalyzer->lex();
 
-		if (lexAnalyzer->getNextToken() == COMMA)
+		if (tokenMatches(COMMA))
 		{
 			lexAnalyzer->lex();
 
 			// Check name list grammar
 			return nameList();
+		}
+		else
+		{
+			return true;
 		}
 	}
 	return false;
@@ -149,28 +170,24 @@ bool SyntaxAnalyzer::statementSequence()
 bool SyntaxAnalyzer::statement()
 {
 	// Check if lexeme is a reserved word
-	if (lexAnalyzer->getNextToken() == RESERVED_WORD)
+	if (tokenMatches(RESERVED_WORD))
 	{
 		// Check if the lexeme is OUTPUT
-		if (lexAnalyzer->getLexeme() == "OUTPUT")
+		if (lexemeMatches("OUTPUT"))
 		{
 			lexAnalyzer->lex();
 
 			// Check the grammar of char expression
 			return charExpression();
 		}
-		else if (lexAnalyzer->getLexeme() == "INPUT")
+		else if (lexemeMatches("INPUT"))
 		{
 			lexAnalyzer->lex();
 
 			// Check the grammar of name
 			return name();
 		}
-	}
-	else 
-	{
-		// Check the test grammar
-		if (test())
+		else if (test())
 		{
 			lexAnalyzer->lex();
 
@@ -180,7 +197,7 @@ bool SyntaxAnalyzer::statement()
 				lexAnalyzer->lex();
 
 				// Check for a colon
-				if (lexAnalyzer->getNextToken() == COLON)
+				if (tokenMatches(COLON))
 				{
 					lexAnalyzer->lex();
 
@@ -196,7 +213,7 @@ bool SyntaxAnalyzer::statement()
 
 bool SyntaxAnalyzer::test()
 {
-	return (lexAnalyzer->getLexeme() == "EQ" || lexAnalyzer->getLexeme() == "NEG");
+	return (lexemeMatches("EQ") || lexemeMatches("NEG"));
 }
 
 
@@ -208,7 +225,7 @@ bool SyntaxAnalyzer::pair()
 		lexAnalyzer->lex();
 
 		// Check for a comma
-		if (lexAnalyzer->getNextToken() == COMMA)
+		if (tokenMatches(COMMA))
 		{
 			lexAnalyzer->lex();
 
@@ -223,44 +240,41 @@ bool SyntaxAnalyzer::pair()
 bool SyntaxAnalyzer::charExpression()
 {
 	// Check for a string literal
-	if (lexAnalyzer->getNextToken() == QUOTE_MARK)
+	if (tokenMatches(QUOTE_MARK))
 	{
 		lexAnalyzer->lex();
 
-		if (lexAnalyzer->getNextToken() == STRING_LIT)
+		if (tokenMatches(STRING_LIT))
 		{
 			lexAnalyzer->lex();
 
-			if (lexAnalyzer->getNextToken() == QUOTE_MARK)
+			if (tokenMatches(QUOTE_MARK))
 			{
 				return true;
 			}
-			else 
-			{
-				// ERROR
-			}
-		}
-		else
-		{
-			// ERROR
 		}
 	}
 	else if (name())
 	{
 		return true;
 	}
+	errorMessage = "ERROR: Expected opening/closing quote mark '\"' at line ";
 	return false;
 }
 
 
 bool SyntaxAnalyzer::name()
 {
-	return (lexAnalyzer->getNextToken() == NAME);
+	return tokenMatches(NAME);
 }
 
 void SyntaxAnalyzer::error()
 {
 	char exit;
+	cout << endl << errorMessage
+		<< lexAnalyzer->getCurrentLine() << ":" << endl << endl;
+	(*fout) << endl << errorMessage
+		<< lexAnalyzer->getCurrentLine() << "." << endl << endl;
 	cout << TAB << TAB << lexAnalyzer->getOldLexeme() << endl << endl
 		<< TAB << "Error on lexeme: " << charArrayForToken(lexAnalyzer->getNextToken())  << endl
 		<< TAB << "Lexeme total length: " << lexAnalyzer->getLexLength() << endl << endl;

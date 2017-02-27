@@ -11,7 +11,10 @@ class SyntaxAnalyzer
 private:
 	ostream *fout;
 	istream *fin;
+	char *errorMessage;
 	LexicalAnalyzer *lexAnalyzer;
+	bool tokenMatches(int);
+	bool lexemeMatches(char *);
 	bool block();
 	bool declarationSequence();
 	bool declaration();

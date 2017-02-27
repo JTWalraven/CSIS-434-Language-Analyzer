@@ -83,6 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="program1.dat" />
+    <None Include="program2.dat" />
+    <None Include="program3.dat" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LexicalAnalyzer.h" />
