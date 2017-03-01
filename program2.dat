@@ -1,6 +1,6 @@
 BEGIN
-	CHAR a b
+	CHAR a, b
 	STRING c, d
-	OUTPUT c
+	TEST c
 	OUTPUT "hello"
 END

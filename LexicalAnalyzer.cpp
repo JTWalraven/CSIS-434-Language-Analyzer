@@ -51,9 +51,11 @@ void LexicalAnalyzer::addChar()
 	if (lexLen <= 98) 
 	{
 		lexeme[lexLen++] = nextChar;
+		lexeme[lexLen] = 0;
+
+		// Set the historical lexeme
 		oldLexeme[lexLen - 1] = nextChar;
 		oldLexeme[lexLen] = 0;
-		lexeme[lexLen] = 0;
 	}
 	else 
 	{
@@ -65,6 +67,7 @@ void LexicalAnalyzer::addChar()
 
 void LexicalAnalyzer::getChar()
 {
+	// Set the next char and check that it is not EOF
 	if ((nextChar = (*fin).get()) != EOF) 
 	{
 		if (isalpha(nextChar))
@@ -132,7 +135,10 @@ int LexicalAnalyzer::lex()
 {
 	// Important! Reset lexLen to 0 to restart lexeme array
 	lexLen = 0;
+
+	// Remove all blank characters
 	getNonBlank();
+
 	switch (charClass) 
 	{
 	case LETTER:
@@ -143,6 +149,7 @@ int LexicalAnalyzer::lex()
 			addChar();
 			getChar();
 		}
+		// Check if a String literal or a name
 		if (nextChar == '"')
 			nextToken = STRING_LIT;
 		else 
@@ -154,7 +161,6 @@ int LexicalAnalyzer::lex()
 			if (strcmp(reservedWords[i], lexeme) == 0)
 				nextToken = RESERVED_WORD;
 		}
-
 		break;
 	case UNKNOWN:
 		lookup(nextChar);

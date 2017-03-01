@@ -99,9 +99,12 @@ bool SyntaxAnalyzer::declarationSequence()
 	if (declaration())
 	{
 		// Check the rest of the sequence
-		declarationSequence();
+		while (declaration());
 		return true;
 	}
+	else
+		errorMessage = "ERROR: Expected declaration at line ";
+
 	return false;
 }
 
@@ -140,32 +143,38 @@ bool SyntaxAnalyzer::nameList()
 	{
 		lexAnalyzer->lex();
 
-		if (tokenMatches(COMMA))
+		// Check the rest of the name list
+		while (tokenMatches(COMMA))
 		{
 			lexAnalyzer->lex();
 
-			// Check name list grammar
-			return nameList();
+			// Check name syntax
+			if (!name())
+				errorMessage = "ERROR: Expected name after comma at line ";
+			
+			lexAnalyzer->lex();
 		}
-		else
-		{
-			return true;
-		}
+		return true;
 	}
+	else
+		errorMessage = "ERROR: Expected name at line ";
 	return false;
 }
 
 
 bool SyntaxAnalyzer::statementSequence()
 {
-	// Check if lexeme is a statement
 	if (statement())
 	{
-		lexAnalyzer->lex();
-
-		// Check statement sequence grammar
-		return statementSequence();
+		// Check if lexeme is a statement
+		do
+		{
+			lexAnalyzer->lex();
+		} while (statement());
+		return true;
 	}
+	else
+		errorMessage = "ERROR: Expected statement at line ";
 	return false;
 }
 
@@ -233,7 +242,10 @@ bool SyntaxAnalyzer::pair()
 			lexAnalyzer->lex();
 
 			// Check name grammar
-			return name();
+			if (name())
+				return true;
+			else
+				errorMessage = "ERROR: Expected name for pair after comma at line ";
 		}
 	}
 	return false;
@@ -255,13 +267,22 @@ bool SyntaxAnalyzer::charExpression()
 			{
 				return true;
 			}
+			else
+			{
+				errorMessage = "ERROR: Expected closing quote mark '\"' at line ";
+				error();
+			}
+		}
+		else
+		{
+			errorMessage = "ERROR: Expected closing quote mark '\"' at line ";
+			error();
 		}
 	}
 	else if (name())
 	{
 		return true;
 	}
-	errorMessage = "ERROR: Expected opening/closing quote mark '\"' at line ";
 	return false;
 }
 
